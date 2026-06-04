@@ -1,0 +1,804 @@
+{
+  "name": "ATS RESUMER",
+  "nodes": [
+    {
+      "parameters": {
+        "formTitle": "Application For Software Engineer Position",
+        "formDescription": "We will get back soon",
+        "formFields": {
+          "values": [
+            {
+              "fieldLabel": "Full Name",
+              "requiredField": true
+            },
+            {
+              "fieldLabel": "Email",
+              "fieldType": "email",
+              "requiredField": true
+            },
+            {
+              "fieldLabel": "Expectation Salary",
+              "fieldType": "number",
+              "requiredField": true
+            },
+            {
+              "fieldLabel": "GITHUB URL ",
+              "requiredField": true
+            },
+            {
+              "fieldLabel": "Linkedin URL ",
+              "requiredField": true
+            },
+            {
+              "fieldLabel": "Resume",
+              "fieldType": "file"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.formTrigger",
+      "typeVersion": 2.5,
+      "position": [
+        0,
+        -176
+      ],
+      "id": "c970137f-3336-4800-b691-ba39115b656c",
+      "name": "On form submission",
+      "webhookId": "3268f477-e300-4764-ade4-c69a7c3aa6cd"
+    },
+    {
+      "parameters": {
+        "operation": "pdf",
+        "binaryPropertyName": "Resume",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.extractFromFile",
+      "typeVersion": 1.1,
+      "position": [
+        368,
+        -176
+      ],
+      "id": "4fe5a285-8f49-4177-b7f5-e7f13470061d",
+      "name": "Extract from File"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $json.text }}",
+        "hasOutputParser": true,
+        "messages": {
+          "messageValues": [
+            {
+              "message": "=You are an expert ATS Resume Analyzer, Technical Recruiter, Interview Coach, and Internship Screening Assistant.\n\nAnalyze the resume and return ONLY valid JSON.\n\nATS SCORING RUBRIC (TOTAL = 100)\n\n1. Technical Skills (25 points)\n2. Projects & Practical Experience (25 points)\n3. Education (15 points)\n4. Keyword Match for Software Engineering Internships (20 points)\n5. Resume Structure & Formatting (15 points)\n\nATS Score Calculation:\n\nATS Score =\nTechnical Skills +\nProjects & Practical Experience +\nEducation +\nKeyword Match +\nResume Structure & Formatting\n\nRULES\n\n* ATS score must be between 0 and 100.\n* ATS score >= 70 → Status = \"Shortlisted\"\n* ATS score < 70 → Status = \"Rejected\"\n* Be strict and consistent while scoring.\n* Do not generate random scores.\n* Score only based on resume content.\n* Provide a minimum of 3 strengths.\n* Provide a minimum of 3 weaknesses.\n* Provide a minimum of 3 suggestions.\n* If fewer than 3 weaknesses exist, generate professional improvement recommendations.\n* If fewer than 3 suggestions exist, generate professional career improvement suggestions.\n* Keep the summary concise and professional.\n* Return ONLY valid JSON.\n* Do not include markdown.\n* Do not include explanations outside JSON.\n\nINTERVIEW QUESTION RULES\n\nIf Status = \"Shortlisted\":\n\n* Generate exactly 10 interview questions.\n* Questions must be based on the candidate's skills, technologies, projects, education, and resume content.\n* Include:\n\n  * Technical Questions\n  * Project-Based Questions\n  * Problem-Solving Questions\n  * Behavioral Questions\n* Questions must be suitable for internship interviews.\n\nIf Status = \"Rejected\":\n\n* Return an empty array:\n\n\"interview_questions\": []\n\nROLE RECOMMENDATION RULES\n\nBased on the candidate's:\n\n* Skills\n* Technologies\n* Projects\n* Education\n* ATS Score\n\nRecommend exactly 3 internship roles.\n\nExamples:\n\n* Frontend Developer Intern\n* Backend Developer Intern\n* Full Stack Developer Intern\n* Python Developer Intern\n* Java Developer Intern\n* Data Analyst Intern\n* Machine Learning Intern\n* Software Engineer Intern\n\nThe recommendations must match the candidate's profile and resume.\n\nOUTPUT FORMAT\n\n{\n\"ats_score\": 0,\n\"status\": \"\",\n\"summary\": \"\",\n\n\"strengths\": [\n\"\",\n\"\",\n\"\"\n],\n\n\"weaknesses\": [\n\"\",\n\"\",\n\"\"\n],\n\n\"suggestions\": [\n\"\",\n\"\",\n\"\"\n],\n\n\"interview_questions\": [\n\"\",\n\"\",\n\"\",\n\"\",\n\"\",\n\"\",\n\"\",\n\"\",\n\"\",\n\"\"\n],\n\n\"recommended_roles\": [\n\"\",\n\"\",\n\"\"\n]\n}\nSKILL GAP ANALYSIS RULES\n\nIdentify exactly 3 important skills missing from the candidate's profile that are commonly required for Software Engineering internships.\n\nExamples:\n\n* Docker\n* AWS\n* CI/CD\n* System Design\n* REST APIs\n* Testing\n\nLEARNING ROADMAP RULES\n\nGenerate exactly 5 actionable learning steps to improve employability and ATS score.\n\nExamples:\n\n* Learn Git and GitHub\n* Build a Full Stack Project\n* Learn Docker Basics\n* Practice DSA\n* Deploy a Project on Cloud\n\nCandidate Information\n\nGitHub URL:\n{{ $('On form submission').item.json['GITHUB URL '] }}\n\nLinkedIn URL:\n{{ $('On form submission').item.json['Linkedin URL '] }}\n\n\nResume Content:\n\n{{ $json.text }}\n"
+            }
+          ]
+        },
+        "batching": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.chainLlm",
+      "typeVersion": 1.9,
+      "position": [
+        656,
+        -176
+      ],
+      "id": "a6b904ff-a390-4d76-a5ca-6dd91ca8f521",
+      "name": "Basic LLM Chain"
+    },
+    {
+      "parameters": {
+        "modelName": "models/gemini-3.1-flash-lite",
+        "options": {
+          "temperature": 0,
+          "topK": 1,
+          "topP": 1
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1.1,
+      "position": [
+        592,
+        64
+      ],
+      "id": "5a03770a-4f38-483f-8235-4f81cd3ee9af",
+      "name": "Google Gemini Chat Model",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "YxFkx13nl9I4LrYV",
+          "name": "Google Gemini(PaLM) Api account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsonSchemaExample": "{\n  \"ats_score\": 82,\n  \"status\": \"Shortlisted\",\n  \"summary\": \"Strong candidate\",\n\n  \"strengths\": [\"\",\"\",\"\"],\n  \"weaknesses\": [\"\",\"\",\"\"],\n  \"suggestions\": [\"\",\"\",\"\"],\n\n  \"interview_questions\": [\"\",\"\",\"\",\"\",\"\",\"\",\"\",\"\",\"\",\"\"],\n\n  \"recommended_roles\": [\"\",\"\",\"\"],\n\n  \"skill_gap_analysis\": [\n    \"Docker\",\n    \"AWS\",\n    \"CI/CD\"\n  ],\n\n  \"learning_roadmap\": [\n    \"Learn Git\",\n    \"Learn SQL\",\n    \"Learn Docker\",\n    \"Build Full Stack Project\",\n    \"Deploy on Cloud\"\n  ],\n\n  \"github_score\": 75,\n\n  \"linkedin_score\": 85,\n\n  \"profile_feedback\": \"LinkedIn profile is good but GitHub needs more projects.\"\n}"
+      },
+      "type": "@n8n/n8n-nodes-langchain.outputParserStructured",
+      "typeVersion": 1.3,
+      "position": [
+        864,
+        48
+      ],
+      "id": "6a185b3b-9356-4461-ae1a-30ea4d05783c",
+      "name": "Structured Output Parser"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "293be91d-d976-4e34-8d19-fe383b1b2981",
+              "leftValue": "={{ $json.output.ats_score }}",
+              "rightValue": 80,
+              "operator": {
+                "type": "number",
+                "operation": "gt"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        1008,
+        -176
+      ],
+      "id": "fa28ec48-4613-419a-8b94-50387fb31bba",
+      "name": "If"
+    },
+    {
+      "parameters": {
+        "sendTo": "=jaswanthbuddepu123@gmail.com",
+        "subject": "New Candidate CV Awaiting Review",
+        "message": "=<h2>📄 New Candidate CV Awaiting Review</h2>\n\n<hr>\n\n<p><b>👤 Candidate Name:</b> {{ $('On form submission').item.json['Full Name'] }}</p>\n\n<p><b>📧 Email:</b> {{ $('On form submission').item.json.Email }}</p>\n\n<p><b>🔗 LinkedIn:</b>{{ $('On form submission').item.json['Linkedin URL '] }}</p>\n\n<p><b>🔗 Github:</b>{{ $json.github }}b</p>\n\n<p><b>🎯 ATS Score:</b> {{ $('If').item.json.output.ats_score }}/100</p>\n\n<p><b>📌 Status:</b> {{ $('If').item.json.output.status }}</p>\n\n<hr>\n\n<h3>✅ Strengths</h3>\n\n{{ '<ul><li>' + $('If').item.json.output.strengths.join('</li><li>') + '</li></ul>' }}\n\n<hr>\n\n<h3>⚠️ Weaknesses</h3>\n\n{{ '<ul><li>' + $('If').item.json.output.weaknesses.join('</li><li>') + '</li></ul>' }}\n\n<hr>\n\n<h3>💡 Suggestions</h3>\n\n{{ '<ul><li>' + $('If').item.json.output.suggestions.join('</li><li>') + '</li></ul>' }}\n\n<hr>\n\n<h3>⭐ Recommended Internship Roles</h3>\n\n{{ '<ul><li>' + $('If').item.json.output.recommended_roles.join('</li><li>') + '</li></ul>' }}\n\n<hr>\n\n<h3>📊 Skill Gap Analysis</h3>\n\n{{ '<ul><li>' + $('If').item.json.output.skill_gap_analysis.join('</li><li>') + '</li></ul>' }}\n\n<hr>\n\n<h3>🛣️ Learning Roadmap</h3>\n\n{{ '<ol><li>' + $('If').item.json.output.learning_roadmap.join('</li><li>') + '</li></ol>' }}\n\n<hr>\n\n<h3>🔗 LinkedIn Profile Score</h3>\n\n<p><b>Score:</b> {{ $('If').item.json.output.linkedin_score }}/100</p>\n\n<hr>\n<h3>🔗 Github Profile Score</h3>\n\n<p><b>Score:</b>{{ $('If').item.json.output.github_score }}/100</p>\n\n<hr>\n\n<h3>📝 Profile Feedback</h3>\n\n<p>{{ $('If').item.json.output.profile_feedback }}</p>\n\n<hr>\n\n<h3>🎤 Interview Questions</h3>\n\n{{ '<ol><li>' + $('If').item.json.output.interview_questions.join('</li><li>') + '</li></ol>' }}\n\n<hr>\n\n<h3>📝 Summary</h3>\n\n<p>{{ $('If').item.json.output.summary }}</p>\n\n<hr>\n\n<h3>📋 Recruiter Recommendation</h3>\n\n<p>\n{{\n$('If').item.json.output.ats_score >= 85\n? '🌟 Highly Recommended Candidate'\n: $('If').item.json.output.ats_score >= 70\n? '✅ Recommended for Interview'\n: '⚠️ Resume Needs Improvement'\n}}\n</p>\n\n<hr>\n\n<p>\n<b>Best Regards \n\nCODEGRES</b><br>\nAutomated Internship Recruitment Assistant\n</p>\n",
+        "options": {
+          "appendAttribution": false
+        }
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.2,
+      "position": [
+        1664,
+        -176
+      ],
+      "id": "b39a5f34-f325-4fff-b7ab-7090aae09f25",
+      "name": "Send a message",
+      "webhookId": "dbfc1fcc-d112-42d2-9bfa-4b9c1afe6734",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "lAgNkzu9VHwU0X1n",
+          "name": "Gmail account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "sendTo": "={{ $('On form submission').item.json.Email }}",
+        "subject": "We have received your CV",
+        "message": "=Dear  {{ $('On form submission').item.json['Full Name'] }} ,\n\n<h3>💼 Recommended Internship Roles</h3>\n\n{{ '<ul><li>' + $('If').item.json.output.recommended_roles.join('</li><li>') + '</li></ul>' }}\n\n<p>\nBased on your resume, these internship roles best match your profile.\n</p>\n\n\n\nThank you for submitting the CV . We have recieved at all and we will notify shortly. \n\n\n                      BEST REGARDS CODEGRES",
+        "options": {
+          "appendAttribution": false
+        }
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.2,
+      "position": [
+        1888,
+        -176
+      ],
+      "id": "70d008ad-ebac-48cb-8667-fbbd246bad73",
+      "name": "Send a message1",
+      "webhookId": "df19977b-28a6-4ebc-be69-87093f5e5f1d",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "lAgNkzu9VHwU0X1n",
+          "name": "Gmail account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "sendTo": "=jaswanthbuddepu123@gmail.com",
+        "subject": "Resume Review Results",
+        "message": "=<h2>📄 New Candidate CV Awaiting Review</h2>\n\n<hr>\n\n<p><b>👤 Candidate Name:</b> {{ $('On form submission').item.json['Full Name'] }}</p>\n\n<p><b>📧 Email:</b> {{ $('On form submission').item.json.Email }}</p>\n\n<p><b>🔗 Linkedin:</b>{{ $('On form submission').item.json['Linkedin URL '] }}</p>\n\n<p><b>🔗 Github:</b>{{ $('On form submission').item.json['GITHUB URL '] }}</p>\n\n<p><b>🎯 ATS Score:</b> {{ $('If').item.json.output.ats_score }}/100</p>\n\n<p><b>📌 Status:</b> Rejected</p>\n\n<hr>\n\n<h3>✅ Strengths</h3>\n\n{{ '<ul><li>' + $('If').item.json.output.strengths.join('</li><li>') + '</li></ul>' }}\n\n<hr>\n\n<h3>⚠️ Weaknesses</h3>\n\n{{ '<ul><li>' + $('If').item.json.output.weaknesses.join('</li><li>') + '</li></ul>' }}\n\n<hr>\n\n<h3>💡 Suggestions</h3>\n\n{{ '<ul><li>' + $('If').item.json.output.suggestions.join('</li><li>') + '</li></ul>' }}\n\n<hr>\n\n<h3>⭐ Recommended Internship Roles</h3>\n\n{{ '<ul><li>' + $('If').item.json.output.recommended_roles.join('</li><li>') + '</li></ul>' }}\n\n<hr>\n\n<h3>📊 Skill Gap Analysis</h3>\n\n{{ '<ul><li>' + $('If').item.json.output.skill_gap_analysis.join('</li><li>') + '</li></ul>' }}\n\n<hr>\n\n<h3>🛣️ Learning Roadmap</h3>\n\n{{ '<ol><li>' + $('If').item.json.output.learning_roadmap.join('</li><li>') + '</li></ol>' }}\n\n<hr>\n\n<h3>🔗 LinkedIn Profile Score</h3>\n\n<p><b>Score:</b> {{ $('If').item.json.output.linkedin_score }}/100</p>\n\n<hr>\n<h3>🔗 Github Profile Score</h3>\n\n<p><b>Score:</b> {{ $json['GitHub Score'] }}/100</p>\n<hr>\n\n<h3>📝 Profile Feedback</h3>\n\n<p>{{ $('If').item.json.output.profile_feedback }}</p>\n\n<hr>\n\n<h3>🎤 Interview Questions</h3>\n\n{{ '<ol><li>' + $('If').item.json.output.interview_questions.join('</li><li>') + '</li></ol>' }}\n\n<hr>\n\n<h3>📝 Summary</h3>\n\n<p>{{ $('If').item.json.output.summary }}</p>\n\n<hr>\n\n<h3>📋 Recruiter Recommendation</h3>\n\n<p>\n{{\n$('If').item.json.output.ats_score >= 85\n? '🌟 Highly Recommended Candidate'\n: $('If').item.json.output.ats_score >= 80\n? '✅ Recommended for Interview'\n: '⚠️ Resume Needs Improvement'\n}}\n</p>\n\n<hr>\n\n<p>\n<b>CODEGRES</b><br>\nAutomated Internship Recruitment Assistant\n</p>\n",
+        "options": {
+          "appendAttribution": false
+        }
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.2,
+      "position": [
+        1504,
+        128
+      ],
+      "id": "7db0d223-7ce2-417d-a0c2-cda534d0d4d5",
+      "name": "Send a message2",
+      "webhookId": "079e5c16-06f6-46f4-bd25-3b48dcddf604",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "lAgNkzu9VHwU0X1n",
+          "name": "Gmail account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "sendTo": "={{ $('On form submission').item.json.Email }}",
+        "subject": "📄 Resume Review Result & Improvement Suggestions",
+        "message": "=Dear {{ $('On form submission').item.json['Full Name'] }} . \n\nThank you for submitting your resume.\n\nAfter reviewing your application, we are unable to proceed with your profile at this time.\n\nWe encourage you to continue improving your skills, projects, and resume, and apply again in the future.\n\nWe appreciate your interest and wish you success in your career journey.\n\nBest Regards,\nInternship Recruitment Team\n",
+        "options": {
+          "appendAttribution": false
+        }
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.2,
+      "position": [
+        1760,
+        128
+      ],
+      "id": "e3f127d7-14ac-4258-a728-09114c84c21b",
+      "name": "Send a message3",
+      "webhookId": "392c3224-bb73-4eae-accd-310adeb9dfb0",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "lAgNkzu9VHwU0X1n",
+          "name": "Gmail account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "11fGqoMIFVids1rZxRczSmeC11qAnolib_mZbqk65q-E",
+          "mode": "list",
+          "cachedResultName": "Shortlisted Students",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/11fGqoMIFVids1rZxRczSmeC11qAnolib_mZbqk65q-E/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 1539290386,
+          "mode": "list",
+          "cachedResultName": "Sheet1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/11fGqoMIFVids1rZxRczSmeC11qAnolib_mZbqk65q-E/edit#gid=1539290386"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "AI Rating and summary": "={{ $json.output.ats_score }}\n{{ $json.output.summary }}\n",
+            "Strengths": "={{ $json.output.strengths }}",
+            "Weaknesses": "={{ $json.output.weaknesses }}",
+            "Suggestions": "={{ $json.output.suggestions }}",
+            "Interview Questions": "={{ $json.output.interview_questions }}",
+            "Skill Gap Analysis": "={{ $json.output.skill_gap_analysis }}",
+            "GitHub Score": "={{ $json.output.github_score }}",
+            "LinkedIn Score": "={{ $json.output.linkedin_score }}",
+            "Profile Feedback": "={{ $json.output.profile_feedback }}",
+            "recommended roles": "={{ $json.output.recommended_roles }}",
+            "Learning Roadmap": "={{ $json.output.learning_roadmap }}",
+            "CV": "={{ $('On form submission').item.json.Resume[0].filename }}",
+            "Full Name": "={{ $('On form submission').item.json['Full Name'] }}",
+            "Email": "={{ $('On form submission').item.json.Email }}",
+            "Linkedin": "={{ $('On form submission').item.json['Linkedin URL '] }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "CV",
+              "displayName": "CV",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Full Name",
+              "displayName": "Full Name",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Email",
+              "displayName": "Email",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Linkedin",
+              "displayName": "Linkedin",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "AI Rating and summary",
+              "displayName": "AI Rating and summary",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Strengths",
+              "displayName": "Strengths",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Weaknesses",
+              "displayName": "Weaknesses",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Suggestions",
+              "displayName": "Suggestions",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Interview Questions",
+              "displayName": "Interview Questions",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Skill Gap Analysis",
+              "displayName": "Skill Gap Analysis",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Learning Roadmap",
+              "displayName": "Learning Roadmap",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "GitHub Score",
+              "displayName": "GitHub Score",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "LinkedIn Score",
+              "displayName": "LinkedIn Score",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Profile Feedback",
+              "displayName": "Profile Feedback",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "recommended roles",
+              "displayName": "recommended roles",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        1232,
+        64
+      ],
+      "id": "d529b43a-7408-42ec-a167-071ac010c4b7",
+      "name": "Append row in sheet1",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "1Ji8Dia7rcF13YpP",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "11fGqoMIFVids1rZxRczSmeC11qAnolib_mZbqk65q-E",
+          "mode": "list",
+          "cachedResultName": "Shortlisted Students",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/11fGqoMIFVids1rZxRczSmeC11qAnolib_mZbqk65q-E/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 1539290386,
+          "mode": "list",
+          "cachedResultName": "Sheet1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/11fGqoMIFVids1rZxRczSmeC11qAnolib_mZbqk65q-E/edit#gid=1539290386"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "CV": "={{ $('On form submission').item.json.Resume[0].filename }}",
+            "Email": "={{ $('On form submission').item.json.Email }}",
+            "Full Name": "={{ $('On form submission').item.json['Full Name'] }}",
+            "Linkedin": "={{ $('On form submission').item.json['Linkedin URL '] }}",
+            "github": "={{ $('On form submission').item.json['GITHUB URL '] }}",
+            "AI Rating and summary": "={{ $json.output.ats_score }}\n\n{{ $json.output.summary }}",
+            "Strengths": "={{ $json.output.strengths }}",
+            "Weaknesses": "={{ $json.output.weaknesses }}",
+            "Suggestions": "={{ $json.output.suggestions }}",
+            "Interview Questions": "={{ $json.output.interview_questions }}",
+            "Skill Gap Analysis": "={{ $json.output.skill_gap_analysis }}",
+            "Learning Roadmap": "={{ $json.output.learning_roadmap }}",
+            "GitHub Score": "={{ $json.output.github_score }}",
+            "LinkedIn Score": "={{ $json.output.linkedin_score }}",
+            "Profile Feedback": "={{ $json.output.profile_feedback }}",
+            "recommended roles": "={{ $json.output.recommended_roles }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "CV",
+              "displayName": "CV",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Full Name",
+              "displayName": "Full Name",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Email",
+              "displayName": "Email",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Linkedin",
+              "displayName": "Linkedin",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "AI Rating and summary",
+              "displayName": "AI Rating and summary",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Strengths",
+              "displayName": "Strengths",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Weaknesses",
+              "displayName": "Weaknesses",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Suggestions",
+              "displayName": "Suggestions",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Interview Questions",
+              "displayName": "Interview Questions",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Skill Gap Analysis",
+              "displayName": "Skill Gap Analysis",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Learning Roadmap",
+              "displayName": "Learning Roadmap",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "GitHub Score",
+              "displayName": "GitHub Score",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "LinkedIn Score",
+              "displayName": "LinkedIn Score",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Profile Feedback",
+              "displayName": "Profile Feedback",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "recommended roles",
+              "displayName": "recommended roles",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "github",
+              "displayName": "github",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        1344,
+        -176
+      ],
+      "id": "193b8cc7-572e-491c-922c-e86f967a1753",
+      "name": "Append row in sheet",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "1Ji8Dia7rcF13YpP",
+          "name": "Google Sheets account"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "On form submission": {
+      "main": [
+        [
+          {
+            "node": "Extract from File",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Extract from File": {
+      "main": [
+        [
+          {
+            "node": "Basic LLM Chain",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Gemini Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Basic LLM Chain",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Structured Output Parser": {
+      "ai_outputParser": [
+        [
+          {
+            "node": "Basic LLM Chain",
+            "type": "ai_outputParser",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Basic LLM Chain": {
+      "main": [
+        [
+          {
+            "node": "If",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If": {
+      "main": [
+        [
+          {
+            "node": "Append row in sheet",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Append row in sheet1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send a message": {
+      "main": [
+        [
+          {
+            "node": "Send a message1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send a message2": {
+      "main": [
+        [
+          {
+            "node": "Send a message3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Append row in sheet1": {
+      "main": [
+        [
+          {
+            "node": "Send a message2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Append row in sheet": {
+      "main": [
+        [
+          {
+            "node": "Send a message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "versionId": "5207f05f-326e-4ce6-90e7-e05f49d60ce6",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "79851d999d432bd8ba3f6fa9204bd255ca2a488f073af4b80517c01aafaca36e"
+  },
+  "id": "TAabAFeAiSYKutWS",
+  "tags": []
+}
