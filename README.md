@@ -50,7 +50,7 @@ ATS Score Calculation
        ▼
 IF Condition
  ┌─────────────┐
- │ ATS ≥ 70    │
+ │ ATS ≥ 80    │
  └─────────────┘
        │
    Shortlisted
@@ -59,7 +59,7 @@ IF Condition
  HR Email + Student Email
 
  ┌─────────────┐
- │ ATS < 70    │
+ │ ATS < 80    │
  └─────────────┘
        │
     Rejected
